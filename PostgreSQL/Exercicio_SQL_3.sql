@@ -1,4 +1,4 @@
-/* ----------- EXERCICIO 2 -----------
+/* ----------- EXERCICIO 3 -----------
 
 Retorne a média de salário hora por estado */
 
