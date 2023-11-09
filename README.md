@@ -1,2 +1,2 @@
-# Scripts-SQL-Server
- Scripts de SQL para SQL Server, MySQL, PostgreSQL e SQLite
+# Scripts-SQL
+ Scripts de SQL para MySQL, PostgreSQL e Oracle
