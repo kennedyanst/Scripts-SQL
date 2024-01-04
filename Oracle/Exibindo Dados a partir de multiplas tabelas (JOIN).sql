@@ -39,3 +39,10 @@ SELECT e.employee_id, e.last_name, e.salary, e.department_id, d.department_name
 FROM employees e JOIN departments d
 ON e.department_id = d.department_id
 WHERE e.salary BETWEEN 10000 AND 15000;
+
+-- SELF JOIN
+SELECT empregado.employee_id "Id_ empregado", empregado.last_name "Sobrenome empregado",
+        gerente.employee_id "Id gerente", gerente.last_name "Sobrenome gerente"
+FROM employees empregado JOIN employees gerente
+ON (empregado.manager_id = gerente.employee_id)
+ORDER BY empregado.employee_id;
