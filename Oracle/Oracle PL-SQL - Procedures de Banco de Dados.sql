@@ -56,4 +56,29 @@ END;
 EXEC PRC_INSERE_EMPREGADO ('Greg', 'Lake', 'GLAKE', '515.127.4961', SYSDATE, 'IT_PROG', 1500, NULL, 103, 60);
 
 COMMIT;
+
+
+-- Utilizando Parametros tipo IN
+
+CREATE OR REPLACE PROCEDURE PRC_AUMENTA_SALARIO_EMPREGADO
+    (pemployee_id       IN NUMBER,
+     ppercentual        IN NUMBER)
+IS
+-- Nenhuma váriavel declarada
+BEGIN
+    UPDATE employees
+    SET salary = salary * (1 + ppercentual / 100)
+    WHERE employee_id = pemployee_id;
+    
+EXCEPTION
+    WHEN OTHERS 
+    THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Erro Oracle' || SQLCODE  || SQLERRM);
+END;
+
+-- Executando a Procedure pelo bloco PL/SQL
+
+BEGIN
+    PRC_AUMENTA_SALARIO_EMPREGADO(109,10);
+    --COMMIT;
     
