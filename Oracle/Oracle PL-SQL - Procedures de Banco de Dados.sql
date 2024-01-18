@@ -47,5 +47,13 @@ END;
 -- Executando a Procedure pelo Bloco PL/SQL
 
 BEGIN
+    prc_insere_empregado('David', 'Bowie', 'DBOWIE', '515.127.4861', SYSDATE, 'IT_PROG', 1500, NULL, 103, 60);
+    COMMIT;
+END;
 
+-- Executando a Procedure com o comando EXECUTE do SQL PLUS
+
+EXEC PRC_INSERE_EMPREGADO ('Greg', 'Lake', 'GLAKE', '515.127.4961', SYSDATE, 'IT_PROG', 1500, NULL, 103, 60);
+
+COMMIT;
     
