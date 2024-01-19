@@ -285,4 +285,15 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('PMANAGER_ID = ' || VMANAGER_ID);
     DBMS_OUTPUT.PUT_LINE('PDEPARTMENT_ID = ' || VDEPARTMENT_ID);
 END;
+
+
+-- Recompilação Procedures de Banco de Dados
+
+
+ALTER PROCEDURE PRC_INSERE_EMPREGADO COMPILE;
+
+
+-- Removendo Procedure de Banco de Dados
+
+DROP PROCEDURE PRC_CONSULTA_EMPREGADO;
         
