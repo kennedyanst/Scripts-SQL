@@ -39,3 +39,26 @@ DESC USER_OBJECTS
 SELECT object_name, object_type, last_ddl_time, timestamp, status
 FROM   user_objects
 WHERE  status = 'INVALID';
+
+
+-- Executando o script  UTLDTREE
+
+@C:\OracleDatabase21cXE\dbhomeXE\rdbms\admin\utldtree.sql
+
+
+exec DEPTREE_FILL('TABLE', 'HR', 'EMPLOYEES');
+
+DESC deptree;
+
+-- Utilizando as Visões DEPTREE
+
+SELECT *
+FROM deptree
+ORDER BY seq#;
+
+-- Utilizando as Visões IDEPTREE
+
+desc ideptree
+
+SELECT *
+FROM ideptree;
