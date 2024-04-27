@@ -229,3 +229,14 @@ ALTER TABLE employees DISABLE ALL TRIGGERS;
 -- Habilitando todas Database DML Triggers da tabela employees
 
 ALTER TABLE employees ENABLE ALL TRIGGERS;
+
+
+-- Consultando Database DML Triggers pelo Dicionario de Dados
+
+SELECT *
+FROM user_triggers
+WHERE table_name = 'EMPLOYEES' AND
+      table_owner = 'HR';
+      
+-- Removendo uma trigger
+DROP TRIGGER B_IUD_VALIDA_HORARIO_EMPLOYEES-S_TRG
