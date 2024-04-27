@@ -41,4 +41,69 @@ BEGIN
             END CASE;
     END IF;
 END;
-        
+
+
+-- Criando a Tabela de Log de Auditoria para Tabela EMPLOYEES para coluna SALARY
+
+DROP TABLE employees_log;
+
+CREATE TABLE employees_log
+(employees_log_id NUMBER (11) NOT NULL,
+dt_log DATE DEFAULT SYSDATE NOT NULL,
+usuario VARCHAR2(30),
+evento CHAR(1) NOT NULL,
+employee_id NUMBER(6) NOT NULL,
+salary-old NUMBER(8,2),
+salary_new NUMBER(8,2));
+
+ALTER TABLE employees_log
+ADD CONSTRAINT employees_log_pk PRIMARY KEY (employees_log_id);
+
+CREATE SEQUENCE employees_log_seq
+START WITH 1
+INCREMENT BY 1
+NOCACHE
+NOCYCLE
+NONAXVALUE;
+
+
+-- Criando uma Trigger que gera Log de Auditoria para a Tabela EMPLOYEES para a coluna SALARY
+
+CREATE OR REPLACE TRIGGER A_IUD_EMPLOYEES_R_TRG
+    AFTER INSERT OR UPDATE OF SALARY OR DELETE
+    ON EMPLOYEES
+    FOR EACH ROW
+DECLARE
+    vevento         employees_log.evento%TYPE;
+    vemployee_id    employees_log.employee_id%TYPE;
+BEGIN
+    CASE
+        WHEN INSERTING 
+        THEN
+            vevento         := 'I';
+            vemployee_id    := :new.employee_id;
+        WHEN UPDATING 
+        THEN
+            vevento         := 'U';
+            vemployee_id    := :new.employee_id;
+        ELSE
+            Vevento         :='D';
+            vemployee-id    := :old.employee_id;
+        END CASE;
+        INSERT INTO employees_log
+            (employees_log_id, 
+            dt_log,
+            usuario, 
+            evento, 
+            employee_id, 
+            salary_old, 
+            salary_new)
+        VALUES
+            (employees_log_seq.nextval,
+            SYSDATE,
+            USER,
+            vevento,
+            vemployee_id,
+            :old.salary,
+            :new.salary);
+END A_IUD_EMPLOYEES_R_TRG;
