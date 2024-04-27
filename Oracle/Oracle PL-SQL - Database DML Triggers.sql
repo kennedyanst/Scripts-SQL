@@ -210,6 +210,22 @@ DECLARE
 BEGIN
     IF :new.salary > PCK_EMPLOYEES_DADOS.gMaxSalary(1) * 1.2
     THEN
-        RAISE_APPLICATION_ERROR(-20001, 'Novo salario não pode ser superior ao maior salario +20%);
+        RAISE_APPLICATION_ERROR(-20001, 'Novo salario não pode ser superior ao maior salario +20%');
     END IF;
 END;
+
+-- DESABILITANDO UMA TRIGGER 
+
+ALTER TRIGGER B_IUD_VALIDA_HORARIO_EMPLOYEES-S_TRG disable;
+
+-- Habilitando Database DML Triggers
+
+ALTER TRIGGER B_IUD_VALIDA_HORARIO_EMPLOYEES_S_TRG enable;
+
+-- Desabilitando todas Database DML Triggers da tabela employees
+
+ALTER TABLE employees DISABLE ALL TRIGGERS;
+
+-- Habilitando todas Database DML Triggers da tabela employees
+
+ALTER TABLE employees ENABLE ALL TRIGGERS;
