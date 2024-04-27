@@ -107,3 +107,109 @@ BEGIN
             :old.salary,
             :new.salary);
 END A_IUD_EMPLOYEES_R_TRG;
+
+
+-- Regras de Mutating Table
+
+/*
+Regra 1 de Mutating Tables: Não altere dados em colunas de chaves primárias,
+chaves estrangeiras ou chaves únicas de tabelas relacionadas aquela na qual
+a trigger disparada está associada
+*/
+
+CREATE OR REPLACE TRIGGER A_I_EMPLOYEES_R_TRG
+AFTER INSERT
+ON employees
+FOR EACH ROW
+BEGIN
+    UPDATE employees
+    SET email = UPPER(SUBSTR(:new.first_name,1,1) || :new.last_name)
+    WHERE employee_id = :new.employee_id;
+END;
+
+-- Testando Violação da Regra 1
+
+SET VERIFY OFF
+BEGIN
+    PRC_INSERE_EMPREGADO('Eric', 'Clapton', 'ECLAPTON', '515.188.4861', SYSDATE, 'IT_PROG', 15000, 103, 60);
+END;
+
+-- Corrigindo a Trigger para que não viole a Regra 1
+
+CREATE OR REPLACE TRIGGER A_I_EMPLOYEES_R_TRG
+BEFORE INSERT
+ON employees
+FOR EACH ROW
+BEGIN
+   :new.email := SUBSTR(:new.first_name, 1,1) || UPPER(:new.last_name);
+END;
+
+
+-- Testando a Correção da Violação da Regra 1
+SET VERIFY OFF
+BEGIN
+    PRC_INSERE_EMPREGADO('Eric', 'Clapton', 'ECLAPTON', '515.188.4861', SYSDATE, 'IT_PROG', 15000, 103, 60);
+END;
+
+COMMIT;
+
+-- Violação da Regra 2 de Mutating Table
+
+/*
+Regra 2 de Mutating Tables: Não leia informação de tabelas que estajam sendo modificadas
+*/
+
+
+CREATE OR REPLACE TRIGGER B_U_VALIDATE_SALARY_EMPLOYEES_R_TRG
+BEFORE UPDATE OF salary
+ON employees
+FOR EACH ROW
+DECLARE
+    vMaxSalary  employees.salary%TYPE;
+BEGIN
+     SELECT MAX(salary)
+     INTO vMaxSalary
+     FROM employees;
+     
+     IF :new.salary > vMaxSalary * 1.2
+     THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Salario não pode ser superior ao maior sálario + 20%');
+    END IF
+END;
+
+-- Resolvendo o problema de mutating Tables
+
+CREATE OR REPLACE PACKAGE PCK_EMPLOYEES_DADOS
+AS
+    TYPE max_salary_table_type IS TABLE OF NUMBER(10,2)
+    INDEX BY BINARY_INTERGER;
+    
+    gMaxSalary max_salary_table_type;
+    
+END PCK_EMPLOYEES_DADOS;
+
+
+CREATE OR REPLACE TRIGGER B_IU_VALIDATE_SALARY_EMPLOYEES_S_TRG
+BEFORE INSERT OR UPDATE OF salary
+ON employees
+--FOR EACH ROW
+DECLARE
+    vMaxSalary employees.salary%TYPE;
+BEGIN
+    SELECT MAX(salary)
+    INTO PCK_EMPLOYEES_DADOS.gMax_Salary(1)
+    FROM employees;
+END;
+
+CREATE OR REPLACE TRIGGER B_IU_VALIDADE-SALARY_EMPLOYEES_R_TRG
+AFTER INSERT OR UPDATE OF salary
+ON employees
+FOR EACH ROW
+DECLARE
+    vMaxSalry employees.salary%TYPE;
+BEGIN
+    IF :new.salary > PCK_EMPLOYEES_DADOS.gMaxSalary(1) * 1.2
+    THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Novo salario não pode ser superior ao maior salario +20%);
+    END IF;
+END;
